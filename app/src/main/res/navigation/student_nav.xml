@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/student_nav"
+    app:startDestination="@id/fragment_schedule">
+
+    <fragment
+        android:id="@+id/fragment_schedule"
+        android:name="com.kdu.busbori.Fragment_schedule"
+        android:label="fragment_schedule"
+        tools:layout="@layout/fragment_schedule" >
+        <action
+            android:id="@+id/action_fragment_schedule_to_fragment_maps"
+            app:destination="@id/fragment_maps" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_maps"
+        android:name="com.kdu.busbori.Fragment_maps"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" >
+        <action
+            android:id="@+id/action_fragment_maps_to_fragment_schedule"
+            app:destination="@id/fragment_schedule" />
+    </fragment>
+</navigation>

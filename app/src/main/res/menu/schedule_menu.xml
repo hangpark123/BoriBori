@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_dobong"
+        android:actionLayout="@layout/schedule_dobong"
+        android:title="도봉산"
+        android:visible="true"
+        tools:ignore="HardcodedText" />
+    <item
+        android:id="@+id/menu_yangjoo"
+        android:actionLayout="@layout/schedule_yangju"
+        android:title="양주"
+        android:visible="true"
+        tools:ignore="HardcodedText" />
+    <item
+        android:id="@+id/menu_701"
+        android:actionLayout="@layout/schedule_701"
+        android:title="701"
+        android:visible="true"
+        tools:ignore="HardcodedText" />
+    <item
+        android:id="@+id/menu_733"
+        android:actionLayout="@layout/schedule_733"
+        android:title="73_3"
+        android:visible="true"
+        tools:ignore="HardcodedText" />
+    <item
+        android:id="@+id/menu_21"
+        android:actionLayout="@layout/schedule_21"
+        android:title="21"
+        android:visible="true"
+        tools:ignore="HardcodedText" />
+
+</menu>

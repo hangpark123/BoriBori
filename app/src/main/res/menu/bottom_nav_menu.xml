@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/nav_schedule"
+        android:actionLayout="@layout/fragment_schedule"
+        android:icon="@drawable/schedule_icon"
+        android:title="Schedule" />
+    <item
+        android:id="@+id/nav_maps"
+        android:actionLayout="@layout/fragment_maps"
+        android:icon="@drawable/bus_icon"
+        android:title="Map" />
+
+</menu>

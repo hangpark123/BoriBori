@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "324766710942",
+    "project_id": "eco-signifier-398010",
+    "storage_bucket": "eco-signifier-398010.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324766710942:android:678b4d1b84c49d25484f8f",
+        "android_client_info": {
+          "package_name": "com.kdu.busbori"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDG2pFADYpYKTjzPyimZ8vwB-is-d2dq00"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

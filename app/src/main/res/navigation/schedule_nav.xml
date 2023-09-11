@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/schedule_nav"
+    app:startDestination="@id/schedule_dobong">
+
+    <fragment
+        android:id="@+id/schedule_dobong"
+        android:name="com.kdu.busbori.Schedule_dobong"
+        android:label="schedule_dobong"
+        tools:layout="@layout/schedule_dobong" >
+        <action
+            android:id="@+id/action_schedule_dobong_to_schedule_yangju"
+            app:destination="@id/schedule_yangju" />
+    </fragment>
+    <fragment
+        android:id="@+id/schedule_yangju"
+        android:name="com.kdu.busbori.Schedule_yangju"
+        android:label="schedule_yangju"
+        tools:layout="@layout/schedule_yangju" >
+        <action
+            android:id="@+id/action_schedule_yangju_to_schedule_701"
+            app:destination="@id/schedule_701" />
+    </fragment>
+    <fragment
+        android:id="@+id/schedule_701"
+        android:name="com.kdu.busbori.Schedule_701"
+        android:label="schedule_701"
+        tools:layout="@layout/schedule_701" >
+        <action
+            android:id="@+id/action_schedule_701_to_schedule_733"
+            app:destination="@id/schedule_733" />
+    </fragment>
+    <fragment
+        android:id="@+id/schedule_733"
+        android:name="com.kdu.busbori.Schedule_733"
+        android:label="schedule_733"
+        tools:layout="@layout/schedule_733" >
+        <action
+            android:id="@+id/action_schedule_733_to_schedule_21"
+            app:destination="@id/schedule_21" />
+    </fragment>
+    <fragment
+        android:id="@+id/schedule_21"
+        android:name="com.kdu.busbori.Schedule_21"
+        android:label="schedule_21"
+        tools:layout="@layout/schedule_21" >
+        <action
+            android:id="@+id/action_schedule_21_to_schedule_dobong"
+            app:destination="@id/schedule_dobong" />
+    </fragment>
+</navigation>
