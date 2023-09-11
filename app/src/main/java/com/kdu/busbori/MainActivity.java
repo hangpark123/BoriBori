@@ -25,13 +25,13 @@ public class MainActivity extends AppCompatActivity {
         passwordEditText = new EditText(this);
         SharedPreferences preferences = getSharedPreferences("ChooseActivity", MODE_PRIVATE);
         String choose = preferences.getString("Choose", "");
-        if ("Driver".equals(choose)) {
+        /*if ("Driver".equals(choose)) {
             finish();
             startActivity(new Intent(this, DriverActivity.class));
         } else if ("Student".equals(choose)) {
             finish();
             startActivity(new Intent(this, StudentActivity.class));
-        }
+        }*/
 
         Button Driverbutton = findViewById(R.id.button_driver);
         Driverbutton.setOnClickListener(new View.OnClickListener() {

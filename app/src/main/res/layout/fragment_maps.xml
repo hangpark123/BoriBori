@@ -42,12 +42,26 @@
                 android:text="양주" />
 
             <Button
+                android:id="@+id/button_deokhyeon"
+                style="@android:style/Widget.Holo.Button.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="덕현초" />
+
+            <Button
+                android:id="@+id/button_campus"
+                style="@android:style/Widget.Holo.Button.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="학교" />
+
+            <Button
                 android:id="@+id/button_route"
                 style="@android:style/Widget.Holo.Button.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="전체경로 보기" />
+                android:text="전체" />
         </LinearLayout>
 
     </FrameLayout>

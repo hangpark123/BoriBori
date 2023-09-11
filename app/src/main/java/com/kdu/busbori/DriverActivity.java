@@ -2,14 +2,20 @@ package com.kdu.busbori;
 
 import static android.service.controls.ControlsProviderService.TAG;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -27,9 +33,16 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DriverActivity extends AppCompatActivity {
     private ToggleButton toggleButton;
+    private FirebaseFirestore firebaseFirestore;
     private boolean isServiceRunning = false;
     private SharedPreferences sharedPreferences;
     @Override
@@ -38,7 +51,10 @@ public class DriverActivity extends AppCompatActivity {
         setContentView(R.layout.activity_driver);
 
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-
+        SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+        String savedTime = preferences.getString("choosetime_text", "");
+        TextView chooseTime = findViewById(R.id.choosetime);
+        chooseTime.setText(savedTime);
         toggleButton = findViewById(R.id.toggle_gps);
         toggleButton.setChecked(isServiceRunning);
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -51,8 +67,85 @@ public class DriverActivity extends AppCompatActivity {
                 }
             }
         });
-    }
 
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        int[] dobong_buttonIds = {
+                R.id.Dobong_0830,
+                R.id.Dobong_0840,
+                R.id.Dobong_0850,
+                R.id.Dobong_0930,
+                R.id.Dobong_0940,
+                R.id.Dobong_0950,
+                R.id.Dobong_1030,
+                R.id.Dobong_1040,
+                R.id.Dobong_1050,
+                R.id.Dobong_1620,
+                R.id.Dobong_1630,
+                R.id.Dobong_1720,
+                R.id.Dobong_1730,
+                R.id.Dobong_1820,
+                R.id.Dobong_1830
+        };
+        int[] yangju_buttonIds = {
+                R.id.Yangju_0810,
+                R.id.Yangju_0845,
+                R.id.Yangju_0850,
+                R.id.Yangju_0910,
+                R.id.Yangju_0940,
+                R.id.Yangju_0950,
+                R.id.Yangju_1030,
+                R.id.Yangju_1110,
+                R.id.Yangju_1330,
+                R.id.Yangju_1400,
+                R.id.Yangju_1430,
+                R.id.Yangju_1530,
+                R.id.Yangju_1610,
+                R.id.Yangju_1700,
+                R.id.Yangju_1740,
+                R.id.Yangju_1745,
+                R.id.Yangju_1830
+        };
+        for (int buttonId : dobong_buttonIds) {
+            Button timeButton = findViewById(buttonId);
+            timeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    String time = "도봉산" + ((Button) view).getText().toString();
+                    @SuppressLint("HardwareIds") String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                    DocumentReference documentReference = firebaseFirestore.collection("BoriGPS").document(deviceId);
+                    chooseTime.setText(time);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("time", time);
+                    editor.putString("choosetime_text", time);
+                    editor.apply();
+                    documentReference.set(data, SetOptions.merge());
+                }
+            });
+        }
+
+        for (int buttonId : yangju_buttonIds) {
+            Button timeButton = findViewById(buttonId);
+            timeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    SharedPreferences preferences = getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    String time = "양주" + ((Button) view).getText().toString();
+                    @SuppressLint("HardwareIds") String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+                    DocumentReference documentReference = firebaseFirestore.collection("BoriGPS").document(deviceId);
+                    chooseTime.setText(time);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("time", time);
+                    editor.putString("choosetime_text", time);
+                    editor.apply();
+                    documentReference.set(data, SetOptions.merge());
+                }
+            });
+        }
+
+    }
     @Override
     protected void onStart() {
         super.onStart();
