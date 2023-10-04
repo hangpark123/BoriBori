@@ -5,11 +5,16 @@
         android:id="@+id/nav_schedule"
         android:actionLayout="@layout/fragment_schedule"
         android:icon="@drawable/schedule_icon"
-        android:title="Schedule" />
+        android:title="시간표" />
     <item
         android:id="@+id/nav_maps"
         android:actionLayout="@layout/fragment_maps"
         android:icon="@drawable/bus_icon"
-        android:title="Map" />
+        android:title="셔틀버스" />
+    <item
+        android:id="@+id/nav_yangjumaps"
+        android:actionLayout="@layout/fragment_maps"
+        android:icon="@drawable/bus_icon"
+        android:title="마을버스" />
 
 </menu>

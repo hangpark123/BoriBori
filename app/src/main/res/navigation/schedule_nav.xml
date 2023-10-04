@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/schedule_dobong"
-        android:name="com.kdu.busbori.Schedule_dobong"
+        android:name="com.kdu.busboristudent.Schedule_dobong"
         android:label="schedule_dobong"
         tools:layout="@layout/schedule_dobong" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/schedule_yangju"
-        android:name="com.kdu.busbori.Schedule_yangju"
+        android:name="com.kdu.busboristudent.Schedule_yangju"
         android:label="schedule_yangju"
         tools:layout="@layout/schedule_yangju" >
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/schedule_701"
-        android:name="com.kdu.busbori.Schedule_701"
+        android:name="com.kdu.busboristudent.Schedule_701"
         android:label="schedule_701"
         tools:layout="@layout/schedule_701" >
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/schedule_733"
-        android:name="com.kdu.busbori.Schedule_733"
+        android:name="com.kdu.busboristudent.Schedule_733"
         android:label="schedule_733"
         tools:layout="@layout/schedule_733" >
         <action
@@ -43,7 +43,7 @@
     </fragment>
     <fragment
         android:id="@+id/schedule_21"
-        android:name="com.kdu.busbori.Schedule_21"
+        android:name="com.kdu.busboristudent.Schedule_21"
         android:label="schedule_21"
         tools:layout="@layout/schedule_21" >
         <action

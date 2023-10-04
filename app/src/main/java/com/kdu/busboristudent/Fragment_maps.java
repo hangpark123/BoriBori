@@ -1,36 +1,37 @@
-package com.kdu.busbori;
+package com.kdu.busboristudent;
+
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.Toast;
-
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
+import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.kdu.busbori.R;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Fragment_maps extends Fragment {
     private GoogleMap googleMap;
@@ -40,12 +41,21 @@ public class Fragment_maps extends Fragment {
     private LatLng Campus = new LatLng(37.810158, 127.071145);
     private LatLng Route = new LatLng(37.757432, 127.055045);
     private Map<String, Marker> markers = new HashMap<>();
+    String deviceid;
+    String time;
+    LatLng latLng;
+    Thread thread;
+    boolean isrunning = true;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
+
+        BasicAWSCredentials credentials = new BasicAWSCredentials("AKIATR4KVIIS74DNZLGD", "KAjjuxbXJE6n1lyeYTuBfikvjtUq8BkQhQ6BUQOB");
+        AmazonDynamoDBClient client = new AmazonDynamoDBClient(credentials);
+        client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -55,26 +65,30 @@ public class Fragment_maps extends Fragment {
                 public void onMapReady(GoogleMap map) {
                     googleMap = map;
 
-                    MarkerOptions dobgusanMarkerOptions = new MarkerOptions();
-                    dobgusanMarkerOptions.position(Dobong);
-                    dobgusanMarkerOptions.title("도봉산");
-                    dobgusanMarkerOptions.snippet("도봉산");
-                    googleMap.addMarker(dobgusanMarkerOptions);
+                    MarkerOptions dobongMarkerOptions = new MarkerOptions();
+                    dobongMarkerOptions.position(Dobong);
+                    dobongMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.dobong));
+                    dobongMarkerOptions.title("도봉산");
+                    dobongMarkerOptions.snippet("도봉산");
+                    googleMap.addMarker(dobongMarkerOptions);
 
                     MarkerOptions yangjuMarkerOptions = new MarkerOptions();
                     yangjuMarkerOptions.position(Yangju);
+                    yangjuMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.yangju));
                     yangjuMarkerOptions.title("양주");
                     yangjuMarkerOptions.snippet("양주");
                     googleMap.addMarker(yangjuMarkerOptions);
 
                     MarkerOptions deokhyeonMarkerOptions = new MarkerOptions();
                     deokhyeonMarkerOptions.position(Deokhyeon);
+                    deokhyeonMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.deokhyeon));
                     deokhyeonMarkerOptions.title("덕현초교");
                     deokhyeonMarkerOptions.snippet("덕현초교");
                     googleMap.addMarker(deokhyeonMarkerOptions);
 
                     MarkerOptions campusMarkerOptions = new MarkerOptions();
                     campusMarkerOptions.position(Campus);
+                    campusMarkerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.campus));
                     campusMarkerOptions.title("학교");
                     campusMarkerOptions.snippet("학교");
                     googleMap.addMarker(campusMarkerOptions);
@@ -129,39 +143,69 @@ public class Fragment_maps extends Fragment {
             }
         });
 
-        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-        CollectionReference collectionReference = firebaseFirestore.collection("BoriGPS");
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    return;
+        thread = new Thread(() -> {
+            while (isrunning) {
+                ScanRequest request = new ScanRequest()
+                        .withTableName("Borigps");
+                ScanResult result = client.scan(request);
+                List<Map<String, AttributeValue>> items = result.getItems();
+
+                if (!(thread.isInterrupted())) {
+                    getActivity().runOnUiThread(() -> {
+                        for (Map<String, AttributeValue> item : items) {
+                            deviceid = Objects.requireNonNull(item.get("deviceid")).getS();
+                            time = Objects.requireNonNull(item.get("time")).getS();
+                            String latitudeStr = item.get("latitude") != null ? item.get("latitude").getS() : null;
+                            String longitudeStr = item.get("longitude") != null ? item.get("longitude").getS() : null;
+
+                            if (latitudeStr != null && longitudeStr != null) {
+                                double latitude = Double.parseDouble(latitudeStr);
+                                double longitude = Double.parseDouble(longitudeStr);
+                                latLng = new LatLng(latitude, longitude);
+
+                                Marker existingMarker = markers.get(deviceid);
+
+                                if (latLng != null && deviceid != null && time != null) {
+                                    if (existingMarker != null) {
+                                        existingMarker.setPosition(latLng);
+                                    } else {
+                                        MarkerOptions markerOptions = new MarkerOptions().position(latLng);
+                                        markerOptions.title(time);
+                                        Marker newMarker = googleMap.addMarker(markerOptions);
+                                        markers.put(deviceid, newMarker);
+                                    }
+                                }
+                            }
+                        }
+                    });
                 }
 
-                for (DocumentChange documentChange : querySnapshot.getDocumentChanges()) {
-                    DocumentSnapshot document = documentChange.getDocument();
-                    String documentId = document.getId();
-                    double latitude = document.getDouble("latitude");
-                    double longitude = document.getDouble("longitude");
-                    String time = document.getString("time");
-                    LatLng latLng = new LatLng(latitude, longitude);
-
-                    Marker existingMarker = markers.get(documentId);
-
-                    if (existingMarker != null) {
-                        existingMarker.setPosition(latLng);
-                    } else {
-                        MarkerOptions markerOptions = new MarkerOptions().position(latLng);
-                        markerOptions.title(time);
-                        Marker newMarker = googleMap.addMarker(markerOptions);
-                        markers.put(documentId, newMarker);
-                    }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         });
+        thread.start();
+        Log.e("Boribus", "스레드 시작");
         return view;
     }
+    @Override
+    public void onPause() {
+        super.onPause();
+        isrunning = false;
+        thread.interrupt();
+        Log.e("Boribus", "스레드 종료");
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isrunning = false;
+        thread.interrupt();
+        Log.e("Boribus", "스레드 종료");
+    }
     private void moveCameraToLocation(LatLng location, float zoom) {
         if (googleMap != null) {
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));

@@ -4,18 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#B49BE1"
-    tools:context=".MainActivity">
-
-    <Button
-        android:id="@+id/button_driver"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="기사"
-        app:layout_constraintLeft_toLeftOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="667dp" />
+    android:background="#B49BE1">
 
     <Button
         android:id="@+id/button_student"

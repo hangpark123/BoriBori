@@ -1,4 +1,4 @@
-package com.kdu.busbori;
+package com.kdu.busboristudent;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.kdu.busbori.R;
 
 public class StudentActivity extends AppCompatActivity {
 
@@ -36,6 +37,11 @@ public class StudentActivity extends AppCompatActivity {
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment, new Fragment_maps())
+                            .commit();
+                } else if(itemId == R.id.nav_yangjumaps){
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment, new Fragment_yangjumaps())
                             .commit();
                 }
                 return true;

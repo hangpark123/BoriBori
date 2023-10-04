@@ -1,4 +1,4 @@
-package com.kdu.busbori;
+package com.kdu.busboristudent;
 
 import org.junit.Test;
 

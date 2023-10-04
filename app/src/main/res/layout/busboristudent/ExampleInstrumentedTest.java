@@ -1,4 +1,4 @@
-package com.kdu.busbori;
+package layout.busboristudent;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.kdu.busbori", appContext.getPackageName());
+        Assert.assertEquals("com.kdu.busbori", appContext.getPackageName());
     }
 }

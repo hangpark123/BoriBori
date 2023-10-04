@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragment_schedule"
-        android:name="com.kdu.busbori.Fragment_schedule"
+        android:name="com.kdu.busboristudent.Fragment_schedule"
         android:label="fragment_schedule"
         tools:layout="@layout/fragment_schedule" >
         <action
@@ -16,11 +16,19 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_maps"
-        android:name="com.kdu.busbori.Fragment_maps"
+        android:name="com.kdu.busboristudent.Fragment_maps"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" >
         <action
-            android:id="@+id/action_fragment_maps_to_fragment_schedule"
+            android:id="@+id/action_fragment_maps_to_fragment_yangjumaps"
+            app:destination="@id/fragment_yangjumaps" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_yangjumaps"
+        android:name="com.kdu.busboristudent.Fragment_yangjumaps"
+        android:label="Fragment_yangjumaps" >
+        <action
+            android:id="@+id/action_fragment_yangjumaps_to_fragment_schedule"
             app:destination="@id/fragment_schedule" />
     </fragment>
 </navigation>

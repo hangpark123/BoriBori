@@ -1,19 +1,15 @@
-package com.kdu.busbori;
+package com.kdu.busboristudent;
 
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.tabs.TabLayout;
+import com.kdu.busbori.R;
 
 public class Fragment_schedule extends Fragment {
     @Override
@@ -78,44 +74,5 @@ public class Fragment_schedule extends Fragment {
         });
 
         return view;
-
-        /*navigationView = view.findViewById(R.id.schedule_bottomNavigationView);
-
-        navigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
-
-                if(itemId == R.id.menu_dobong){
-                    getChildFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.schedule_fragment, new Schedule_dobong())
-                            .commit();
-                } else if(itemId == R.id.menu_yangjoo){
-                    getChildFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.schedule_fragment, new Schedule_yangju())
-                            .commit();
-                } else if(itemId == R.id.menu_701){
-                    getChildFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.schedule_fragment, new Schedule_701())
-                            .commit();
-                } else if(itemId == R.id.menu_733){
-                    getChildFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.schedule_fragment, new Schedule_733())
-                            .commit();
-                } else if(itemId == R.id.menu_21){
-                    getChildFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.schedule_fragment, new Schedule_21())
-                            .commit();
-                }
-                return true;
-            }
-        });
-
-        return view;*/
     }
 }
