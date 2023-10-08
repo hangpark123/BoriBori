@@ -1,6 +1,9 @@
 package com.kdu.busboristudent;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -21,27 +24,95 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        SharedPreferences preferences = getSharedPreferences("ChooseActivity", MODE_PRIVATE);
-        String choose = preferences.getString("Choose", "");
-        /*if ("Student".equals(choose)) {
-            finish();
-            startActivity(new Intent(this, StudentActivity.class));
-        }*/
-        Button Studentbutton = findViewById(R.id.button_student);
-        Studentbutton.setOnClickListener(new View.OnClickListener() {
+
+        Button Schedulebutton = findViewById(R.id.button_schedule);
+        Button Campusbutton = findViewById(R.id.button_cam);
+        Button bus701button = findViewById(R.id.button_701);
+        Button bus21button = findViewById(R.id.button_21);
+        Button bus733button = findViewById(R.id.button_733);
+        Schedulebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences preferences = getSharedPreferences("ChooseActivity", MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Choose", "");
-                editor.putString("Choose","Student");
-                editor.apply();
-                Intent intent_student = new Intent(MainActivity.this, StudentActivity.class);
-                startActivity(intent_student);
-                overridePendingTransition(R.anim.slide_right, R.anim.none);
-                finish();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                Fragment fragment = new Fragment_schedule();
+                fragmentTransaction.replace(R.id.container, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
+        Campusbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                Fragment fragment = new Fragment_maps();
+                fragmentTransaction.replace(R.id.container, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+        bus701button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                Fragment fragment = new Yangjumaps_701();
+                fragmentTransaction.replace(R.id.container, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+        bus21button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                Fragment fragment = new Yangjumaps_21();
+                fragmentTransaction.replace(R.id.container, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+        bus733button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                Fragment fragment = new Yangjumaps_733();
+                fragmentTransaction.replace(R.id.container, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
+    }
+    @Override
+    public void onBackPressed() {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.container);
+
+        if (currentFragment instanceof Yangjumaps_701) {
+            Yangjumaps_701 yangjumaps_701 = (Yangjumaps_701) currentFragment;
+            if (yangjumaps_701.isSlidingPanelExpanded()) {
+                yangjumaps_701.collapseSlidingPanel();
+            } else {
+                super.onBackPressed();
+            }
+        } else if (currentFragment instanceof Yangjumaps_733) {
+            Yangjumaps_733 yangjumaps_733 = (Yangjumaps_733) currentFragment;
+            if (yangjumaps_733.isSlidingPanelExpanded()) {
+                yangjumaps_733.collapseSlidingPanel();
+            } else {
+                super.onBackPressed();
+            }
+        } else if (currentFragment instanceof Yangjumaps_21) {
+            Yangjumaps_21 yangjumaps_21 = (Yangjumaps_21) currentFragment;
+            if (yangjumaps_21.isSlidingPanelExpanded()) {
+                yangjumaps_21.collapseSlidingPanel();
+            } else {
+                super.onBackPressed();
+            }
+        } else {
+            super.onBackPressed();
+        }
     }
 }

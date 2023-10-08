@@ -6,14 +6,74 @@
     android:layout_height="match_parent"
     android:background="#B49BE1">
 
-    <Button
-        android:id="@+id/button_student"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="학생"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="307dp"
-        tools:layout_editor_absoluteY="667dp" />
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <Button
+                android:id="@+id/button_schedule"
+                android:layout_width="294dp"
+                android:layout_height="136dp"
+                android:text="시간표"
+                tools:ignore="MissingConstraints" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <Button
+                android:id="@+id/button_cam"
+                android:layout_width="124dp"
+                android:layout_height="133dp"
+                android:text="셔틀버스"
+                tools:ignore="MissingConstraints" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <Button
+                android:id="@+id/button_701"
+                android:layout_width="124dp"
+                android:layout_height="133dp"
+                android:text="701"
+                tools:ignore="MissingConstraints" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/button_21"
+                android:layout_width="124dp"
+                android:layout_height="133dp"
+                android:text="21"
+                tools:ignore="MissingConstraints" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/button_733"
+                android:layout_width="124dp"
+                android:layout_height="133dp"
+                android:text="73-3"
+                tools:ignore="MissingConstraints" />
+        </TableRow>
+    </TableLayout>
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

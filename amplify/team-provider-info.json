@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-busboristudent-dev-152638-authRole",
+      "UnauthRoleArn": "arn:aws:iam::244567065125:role/amplify-busboristudent-dev-152638-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::244567065125:role/amplify-busboristudent-dev-152638-authRole",
+      "Region": "ap-northeast-2",
+      "DeploymentBucketName": "amplify-busboristudent-dev-152638-deployment",
+      "UnauthRoleName": "amplify-busboristudent-dev-152638-unauthRole",
+      "StackName": "amplify-busboristudent-dev-152638",
+      "StackId": "arn:aws:cloudformation:ap-northeast-2:244567065125:stack/amplify-busboristudent-dev-152638/529464d0-5aa3-11ee-9c54-02214d747a24",
+      "AmplifyAppId": "d1uqsqr21ivqd"
+    }
+  }
+}

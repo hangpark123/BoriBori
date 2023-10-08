@@ -46,16 +46,15 @@ public class Fragment_maps extends Fragment {
     LatLng latLng;
     Thread thread;
     boolean isrunning = true;
+    BasicAWSCredentials credentials = new BasicAWSCredentials("AKIATR4KVIIS74DNZLGD", "KAjjuxbXJE6n1lyeYTuBfikvjtUq8BkQhQ6BUQOB");
+    AmazonDynamoDBClient client = new AmazonDynamoDBClient(credentials);
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
-
-        BasicAWSCredentials credentials = new BasicAWSCredentials("AKIATR4KVIIS74DNZLGD", "KAjjuxbXJE6n1lyeYTuBfikvjtUq8BkQhQ6BUQOB");
-        AmazonDynamoDBClient client = new AmazonDynamoDBClient(credentials);
-        client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -143,6 +142,12 @@ public class Fragment_maps extends Fragment {
             }
         });
 
+        return view;
+    }
+    public void onStart(){
+        super.onStart();
+        isrunning = true;
+        client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
         thread = new Thread(() -> {
             while (isrunning) {
                 ScanRequest request = new ScanRequest()
@@ -155,8 +160,8 @@ public class Fragment_maps extends Fragment {
                         for (Map<String, AttributeValue> item : items) {
                             deviceid = Objects.requireNonNull(item.get("deviceid")).getS();
                             time = Objects.requireNonNull(item.get("time")).getS();
-                            String latitudeStr = item.get("latitude") != null ? item.get("latitude").getS() : null;
-                            String longitudeStr = item.get("longitude") != null ? item.get("longitude").getS() : null;
+                            String latitudeStr = item.get("latitude") != null ? Objects.requireNonNull(item.get("latitude")).getS() : null;
+                            String longitudeStr = item.get("longitude") != null ? Objects.requireNonNull(item.get("longitude")).getS() : null;
 
                             if (latitudeStr != null && longitudeStr != null) {
                                 double latitude = Double.parseDouble(latitudeStr);
@@ -171,6 +176,7 @@ public class Fragment_maps extends Fragment {
                                     } else {
                                         MarkerOptions markerOptions = new MarkerOptions().position(latLng);
                                         markerOptions.title(time);
+                                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.schoolbusicon));
                                         Marker newMarker = googleMap.addMarker(markerOptions);
                                         markers.put(deviceid, newMarker);
                                     }
@@ -188,23 +194,18 @@ public class Fragment_maps extends Fragment {
             }
         });
         thread.start();
-        Log.e("Boribus", "스레드 시작");
-        return view;
     }
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         isrunning = false;
         thread.interrupt();
-        Log.e("Boribus", "스레드 종료");
     }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
         isrunning = false;
         thread.interrupt();
-        Log.e("Boribus", "스레드 종료");
     }
     private void moveCameraToLocation(LatLng location, float zoom) {
         if (googleMap != null) {
