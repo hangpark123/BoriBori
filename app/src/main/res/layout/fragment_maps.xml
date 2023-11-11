@@ -91,13 +91,27 @@
                     android:layout_height="2dp"
                     android:background="#CCCCCC" />
 
-                <ListView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/RunList"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:background="#FFFFFF" />
             </LinearLayout>
         </TableRow>
-
     </TableLayout>
+    <FrameLayout
+        android:id="@+id/progressBar_maps"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#8AE1E1E1"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:ignore="MissingConstraints" />
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

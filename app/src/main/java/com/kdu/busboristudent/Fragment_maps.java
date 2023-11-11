@@ -3,20 +3,24 @@ package com.kdu.busboristudent;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -40,6 +44,7 @@ import com.kdu.busbori.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -54,14 +59,14 @@ public class Fragment_maps extends Fragment {
     private Map<String, Marker> markers = new HashMap<>();
     private Map<String, String> deviceIdToTimeMap = new HashMap<>();
     private Map<String, String> deviceIdToRunMap = new HashMap<>();
-    private ListView listView;
-    private ArrayAdapter<String> listAdapter;
     private String deviceid;
+    private String destination;
+    private String type;
     private String time;
     private String Run;
     private String distance;
     private LatLng latLng;
-    private Thread thread;
+    private Thread datathread;
     private Thread routethread;
     boolean isrunning = true;
     private RecyclerView recyclerView;
@@ -71,6 +76,7 @@ public class Fragment_maps extends Fragment {
     private AmazonDynamoDBClient client = new AmazonDynamoDBClient(credentials);
     private int selectedItem = -1;
     private Map<String, LatLng> stationCoordinates = new HashMap<>();
+    private FrameLayout progressBar;
 
     @Nullable
     @Override
@@ -78,6 +84,14 @@ public class Fragment_maps extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        progressBar = view.findViewById(R.id.progressBar_maps);
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView = view.findViewById(R.id.RunList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        if (adapter == null) {
+            adapter = new School_Adapter(School_dataList);
+        }
+        recyclerView.setAdapter(adapter);
         TabLayout tabs = view.findViewById(R.id.schooltab);
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -112,19 +126,6 @@ public class Fragment_maps extends Fragment {
                 }
             });
         }
-        listView = view.findViewById(R.id.RunList);
-        listAdapter = new ArrayAdapter<>(this.getContext(), R.layout.listview_item_layout, R.id.textview, new ArrayList<>(deviceIdToTimeMap.values()));
-        listView.setAdapter(listAdapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedDeviceId = getSelectedDeviceId(position);
-                moveCameraToMarker(selectedDeviceId);
-            }
-        });
-
-
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -170,7 +171,19 @@ public class Fragment_maps extends Fragment {
                 fragmentTransaction.commit();
             }
         });
-
+        adapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = recyclerView.getChildAdapterPosition(v);
+                if (position != RecyclerView.NO_POSITION) {
+                    selectedItem = position;
+                    School_DataItem clickedItem = School_dataList.get(position);
+                    String deviceId = clickedItem.getDeviceId();
+                    moveCameraToMarker(deviceId);
+                }
+            }
+        });
+        recyclerView.setAdapter(adapter);
         return view;
     }
 
@@ -180,84 +193,11 @@ public class Fragment_maps extends Fragment {
         BusRoute();
     }
 
-    @SuppressLint("DefaultLocale")
+    @SuppressLint({"DefaultLocale", "NotifyDataSetChanged"})
     public void onStart(){
         super.onStart();
         isrunning = true;
-        client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
-        thread = new Thread(() -> {
-            while (isrunning) {
-                ScanRequest request = new ScanRequest()
-                        .withTableName("Borigps");
-                ScanResult result = client.scan(request);
-                List<Map<String, AttributeValue>> items = result.getItems();
-
-                if (!(thread.isInterrupted())) {
-                    getActivity().runOnUiThread(() -> {
-                        for (Map<String, AttributeValue> item : items) {
-                            deviceid = Objects.requireNonNull(item.get("deviceid")).getS();
-                            time = Objects.requireNonNull(item.get("time")).getS();
-                            String latitudeStr = item.get("latitude") != null ? Objects.requireNonNull(item.get("latitude")).getS() : null;
-                            String longitudeStr = item.get("longitude") != null ? Objects.requireNonNull(item.get("longitude")).getS() : null;
-                            Run = item.get("Run") != null ? Objects.requireNonNull(item.get("Run")).getS() : null;
-
-                            if (latitudeStr != null && longitudeStr != null) {
-                                double latitude = Double.parseDouble(latitudeStr);
-                                double longitude = Double.parseDouble(longitudeStr);
-                                latLng = new LatLng(latitude, longitude);
-
-                                if (time.contains("도봉산[등교]")){
-                                    double calculatedDistance = calculateDistance(Dobong, latLng);
-                                    distance = (int)calculatedDistance + "m";
-                                } else if (time.contains("도봉산[하교]")){
-                                    double calculatedDistance = calculateDistance(Dobong, latLng);
-                                    distance = (int)calculatedDistance + "m";
-                                } else if (time.contains("양주[등교]")){
-                                    double calculatedDistance = calculateDistance(Yangju, latLng);
-                                    distance = (int)calculatedDistance + "m";
-                                } else if (time.contains("양주[하교]")){
-                                    double calculatedDistance = calculateDistance(Yangju, latLng);
-                                    distance = (int)calculatedDistance + "m";
-                                }
-                                updateListViewData();
-                                deviceIdToTimeMap.put(deviceid, time + "\n" + "도착까지 : " + distance);
-                                deviceIdToRunMap.put(deviceid, Run);
-                                Marker existingMarker = markers.get(deviceid);
-
-                                if (latLng != null && deviceid != null && time != null) {
-                                    if (existingMarker != null) {
-                                        existingMarker.setPosition(latLng);
-                                        if (Run.equals("운행 중")){
-                                            existingMarker.setVisible(true);
-                                        }else {
-                                            existingMarker.setVisible(false);
-                                        }
-                                    } else {
-                                        MarkerOptions markerOptions = new MarkerOptions().position(latLng);
-                                        markerOptions.title(time);
-                                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.schoolbusicon_50));
-                                        Marker newMarker = googleMap.addMarker(markerOptions);
-                                        markers.put(deviceid, newMarker);
-                                        if (Run.equals("운행 중")){
-                                            Objects.requireNonNull(newMarker).setVisible(true);
-                                        }else {
-                                            Objects.requireNonNull(newMarker).setVisible(false);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        thread.start();
+        BusData();
     }
     private void BusRoute() {
         client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
@@ -283,33 +223,90 @@ public class Fragment_maps extends Fragment {
         });
         routethread.start();
     }
-    private String getSelectedDeviceId(int position) {
-        if (position < 0 || position >= listAdapter.getCount()) {
-            return null;
-        }
-        String selectedTime = listAdapter.getItem(position);
-        for (Map.Entry<String, String> entry : deviceIdToTimeMap.entrySet()) {
-            if (entry.getValue().equals(selectedTime)) {
-                return entry.getKey();
+    @SuppressLint("NotifyDataSetChanged")
+    private void BusData(){
+        client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
+        datathread = new Thread(() -> {
+            while (isrunning) {
+                ScanRequest request = new ScanRequest()
+                        .withTableName("Borigps");
+                ScanResult result = client.scan(request);
+                List<Map<String, AttributeValue>> items = result.getItems();
+                if (!(datathread.isInterrupted())) {
+                    requireActivity().runOnUiThread(() -> {
+                        School_dataList.clear();
+                        for (Map<String, AttributeValue> item : items) {
+                            deviceid = Objects.requireNonNull(item.get("deviceid")).getS();
+                            destination = Objects.requireNonNull(item.get("destination")).getS();
+                            type = Objects.requireNonNull(item.get("type")).getS();
+                            time = Objects.requireNonNull(item.get("time")).getS();
+                            String latitudeStr = item.get("latitude") != null ? Objects.requireNonNull(item.get("latitude")).getS() : null;
+                            String longitudeStr = item.get("longitude") != null ? Objects.requireNonNull(item.get("longitude")).getS() : null;
+                            Run = item.get("Run") != null ? Objects.requireNonNull(item.get("Run")).getS() : null;
+                            School_DataItem dataItem = new School_DataItem(deviceid, destination, type, time, latLng, Run, distance);
+                            if (latitudeStr != null && longitudeStr != null) {
+                                double latitude = Double.parseDouble(latitudeStr);
+                                double longitude = Double.parseDouble(longitudeStr);
+                                latLng = new LatLng(latitude, longitude);
+
+                                if (type.equals("등교")){
+
+                                } else if (type.equals("하교")){
+
+                                }
+
+                                if (time.contains("도봉산[등교]")){
+                                    double calculatedDistance = calculateDistance(Dobong, latLng);
+                                    distance = (int)calculatedDistance + "m";
+                                } else if (time.contains("도봉산[하교]")){
+                                    double calculatedDistance = calculateDistance(Dobong, latLng);
+                                    distance = (int)calculatedDistance + "m";
+                                } else if (time.contains("양주[등교]")){
+                                    double calculatedDistance = calculateDistance(Yangju, latLng);
+                                    distance = (int)calculatedDistance + "m";
+                                } else if (time.contains("양주[하교]")){
+                                    double calculatedDistance = calculateDistance(Yangju, latLng);
+                                    distance = (int)calculatedDistance + "m";
+                                }
+
+                                Marker existingMarker = markers.get(deviceid);
+                                if (latLng != null && deviceid != null && time != null) {
+                                    if (existingMarker != null) {
+                                        existingMarker.setPosition(latLng);
+                                        if (Run.equals("운행 중")){
+                                            School_dataList.add(dataItem);
+                                            existingMarker.setVisible(true);
+                                        }else {
+                                            existingMarker.setVisible(false);
+                                        }
+                                    } else {
+                                        MarkerOptions markerOptions = new MarkerOptions().position(latLng);
+                                        markerOptions.title(time);
+                                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.schoolbusicon_50));
+                                        Marker newMarker = googleMap.addMarker(markerOptions);
+                                        markers.put(deviceid, newMarker);
+                                        if (Run.equals("운행 중")){
+                                            Objects.requireNonNull(newMarker).setVisible(true);
+                                        }else {
+                                            Objects.requireNonNull(newMarker).setVisible(false);
+                                        }
+                                    }
+                                }
+                                adapter.updateAdapterData(School_dataList);
+                            }
+                        }
+                        progressBar.setVisibility(View.GONE);
+                    });
+                }
+
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        return null;
-    }
-    private void updateListViewData() {
-        listAdapter.clear();
-
-        for (Map.Entry<String, String> entry : deviceIdToTimeMap.entrySet()) {
-            String deviceId = entry.getKey();
-            String time = entry.getValue();
-            String Run = deviceIdToRunMap.get(deviceId);
-
-            if ("운행 중".equals(Run)) {
-                listAdapter.add(time);
-            } else {
-            }
-        }
-
-        listAdapter.notifyDataSetChanged();
+        });
+        datathread.start();
     }
     private double calculateDistance(LatLng point1, LatLng point2) {
         double earthRadius = 6371000;
@@ -341,13 +338,13 @@ public class Fragment_maps extends Fragment {
     public void onStop() {
         super.onStop();
         isrunning = false;
-        thread.interrupt();
+        datathread.interrupt();
     }
     @Override
     public void onDestroy() {
         super.onDestroy();
         isrunning = false;
-        thread.interrupt();
+        datathread.interrupt();
     }
     private void moveCameraToLocation(LatLng location, float zoom) {
         if (googleMap != null) {

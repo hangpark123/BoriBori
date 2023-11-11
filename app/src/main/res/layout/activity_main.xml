@@ -42,7 +42,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="* 운행 시간표"
+                android:text="운행 시간표"
                 android:textColor="#26383A"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -83,7 +83,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="* 실시간 위치"
+                android:text="실시간 위치"
                 android:textColor="#26383A"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -164,7 +164,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="* 즐겨찾기"
+                android:text="즐겨찾기"
                 android:textColor="#26383A"
                 android:textSize="18sp"
                 android:textStyle="bold" />
