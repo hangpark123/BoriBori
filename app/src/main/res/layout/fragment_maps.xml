@@ -1,66 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#C4E6E4">
 
-    <FrameLayout
+    <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="15dp"
+        tools:layout_editor_absoluteY="15dp">
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+        <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="bottom"
-            tools:context=".Fragment_maps"/>
+            android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/buttonlayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/button_dobong"
-                style="@android:style/Widget.Holo.Button.Small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="도봉산" />
-
-            <Button
-                android:id="@+id/button_yangju"
-                style="@android:style/Widget.Holo.Button.Small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="양주" />
-
-            <Button
-                android:id="@+id/button_deokhyeon"
-                style="@android:style/Widget.Holo.Button.Small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="덕현초" />
-
-            <Button
-                android:id="@+id/button_campus"
-                style="@android:style/Widget.Holo.Button.Small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="학교" />
-
-            <Button
-                android:id="@+id/button_route"
-                style="@android:style/Widget.Holo.Button.Small"
-                android:layout_width="wrap_content"
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/schooltab"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="전체" />
-        </LinearLayout>
+                android:background="#FFFFFF"
+                app:tabIndicatorColor="#FFFFFF"
+                app:tabIndicatorHeight="2dp"
+                app:tabSelectedTextColor="#3F51B5"
+                app:tabTextColor="#3F51B5">
 
-    </FrameLayout>
+                <com.google.android.material.tabs.TabItem
+                    android:id="@+id/taball"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="전체" />
+            </com.google.android.material.tabs.TabLayout>
+        </TableRow>
 
+        <TableRow
+            android:id="@+id/maprow"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <fragment
+                    android:id="@+id/map"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="bottom"
+                    android:layout_weight="1"
+                    tools:context=".Fragment_maps" />
+
+                <Button
+                    android:id="@+id/schedule_school"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/schedulecicon" />
+
+            </FrameLayout>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/maprow">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#F4F4F4"
+                    android:gravity="center"
+                    android:text="운행 정보" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#CCCCCC" />
+
+                <ListView
+                    android:id="@+id/RunList"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:background="#FFFFFF" />
+            </LinearLayout>
+        </TableRow>
+
+    </TableLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

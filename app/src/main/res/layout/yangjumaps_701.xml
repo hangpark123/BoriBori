@@ -50,7 +50,6 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="20dp"
                 android:clickable="true"
-                app:backgroundTint="@color/white"
                 app:layout_constraintBottom_toTopOf="@+id/null_701"
                 app:layout_constraintEnd_toEndOf="@+id/map_701"
                 app:showMotionSpec="@android:anim/cycle_interpolator"
@@ -117,7 +116,7 @@
                             android:layout_height="wrap_content"
                             android:text="701"
                             android:textColor="#0088FF"
-                            android:textSize="20sp" />
+                            android:textSize="17sp" />
                     </TableRow>
 
                     <View
@@ -137,7 +136,8 @@
                             android:id="@+id/textView2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="경동대학교 ↔ 양주역" />
+                            android:text="경동대학교 ↔ 양주역    06:30~22:30  배차간격 50-110분"
+                            android:textColor="#000000" />
                     </TableRow>
 
                     <TableRow
@@ -145,10 +145,10 @@
                         android:layout_height="wrap_content">
 
                         <TextView
-                            android:id="@+id/textView3"
+                            android:id="@+id/textViewNow_701"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="06:30~22:30  배차간격 50-110분" />
+                            android:text="" />
                     </TableRow>
 
                     <TableRow
@@ -167,18 +167,12 @@
                         android:layout_height="wrap_content"
                         android:gravity="center|right">
 
-                        <Button
+                        <ImageButton
                             android:id="@+id/schedulebutton_701"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:drawableLeft="@drawable/scheduleicon_20"
-                            android:insetTop="0dp"
-                            android:insetBottom="0dp"
-                            android:text="시간표"
-                            android:textColor="#959595"
-                            app:iconTint="#7A7A7A"
-                            app:strokeColor="#B3B3B3" />
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_gravity="bottom|end"
+                            android:background="@drawable/schedulecicon" />
                     </TableRow>
                 </LinearLayout>
             </FrameLayout>
@@ -202,11 +196,11 @@
                 android:background="#F3F3F3"
                 android:tag="701"
                 app:layout_constraintTop_toBottomOf="@+id/slide_top_701"
-                app:tabIndicatorColor="#8DCD6C"
+                app:tabIndicatorColor="#F3F3F3"
                 app:tabIndicatorFullWidth="true"
                 app:tabIndicatorHeight="2dp"
                 app:tabSelectedTextColor="#000000"
-                app:tabTextColor="#808080"
+                app:tabTextColor="#000000"
                 tools:ignore="MissingConstraints">
 
                 <com.google.android.material.tabs.TabItem
@@ -239,4 +233,20 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+    <FrameLayout
+        android:id="@+id/progressBar_701"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#8AE1E1E1"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:ignore="MissingConstraints" />
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

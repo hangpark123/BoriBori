@@ -1,17 +1,15 @@
 package com.kdu.busboristudent;
 
-import static androidx.recyclerview.widget.RecyclerView.*;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,6 +20,16 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryResult;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
+import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -49,6 +57,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,29 +70,39 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class Yangjumaps_701 extends Fragment {
     private static final String CACHE_KEY = "busRouteData_701";
-    private static final String LOCATIONCACHE_KEY = "busLocationData_701";
     private static final String SERVICE_KEY = "7d5zmWvwEZpaRX9CIT1%2B4B4zWcsM5VHsA9gkQJ3fJEiv8%2BpuOnHZY9zwprseP3wmK0XbPoDKQl%2BUGKNBi419Ag%3D%3D";
     private static final String ROUTE_ID701 = "235000091";
     private static final String ROUTE_ENDPOINT = "https://apis.data.go.kr/6410000/busrouteservice/getBusRouteStationList";
-    private static final String LOCATION_ENDPOINT = "https://apis.data.go.kr/6410000/buslocationservice/getBusLocationList";
-    private static final String PREDICT_ENDPOINT = "https://openapi.gbis.go.kr/ws/rest/busarrivalservice";
-    private String predict_flag;
     private String predict_locationNo;
     private String predict_time;
-    private String predict_busNo;
-    private String predict_stationId;
     private RecyclerView recyclerView;
-    private MyAdapter adapter_701;
-    private List<MyDataItem> dataList = new ArrayList<>();
+    private Route_Adapter adapter_701;
+    private List<Route_DataItem> Route_dataList = new ArrayList<>();
     private GoogleMap googleMap;
     private LatLng middle = new LatLng(37.795385, 127.057775);
     private Map<String, Marker> markers = new HashMap<>();
     private String busStationId;
-    private Marker busMarker;
+    private String busEnd;
+    private String busNo;
+    private TextView endtext;
+    private TextView nametext;
+    private TextView timetext;
     private Thread locationThread_701;
+    private Thread routeThread_701;
+    private Thread predictThread_701;
     boolean isrunning = true;
     private SlidingUpPanelLayout sliding_layout;
     private TabLayout tabLayout;
+    FrameLayout progressBar;
+    private int selectedItem = -1;
+    private String selectedstationName;
+    BasicAWSCredentials credentials = new BasicAWSCredentials("AKIATR4KVIIS74DNZLGD", "KAjjuxbXJE6n1lyeYTuBfikvjtUq8BkQhQ6BUQOB");
+    AmazonDynamoDBClient client = new AmazonDynamoDBClient(credentials);
+    private String Bus = "701";
+    private Context savecontext;
+
+    public Yangjumaps_701() {
+    }
 
     @SuppressLint({"MissingInflatedId", "NotifyDataSetChanged", "ResourceType"})
     @Nullable
@@ -97,19 +116,24 @@ public class Yangjumaps_701 extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         sliding_layout = view.findViewById(R.id.slidingUpPanelLayout_701);
         tabLayout = view.findViewById(R.id.slidetab_701);
+        endtext = view.findViewById(R.id.textViewNow_701);
+        nametext = view.findViewById(R.id.textViewName_701);
+        timetext = view.findViewById(R.id.textViewTime_701);
+        progressBar = view.findViewById(R.id.progressBar_701);
+        progressBar.setVisibility(View.VISIBLE);
+        if (adapter_701 == null) {
+            adapter_701 = new Route_Adapter(Route_dataList, busStationId, recyclerView, tabLayout, Bus, savecontext);
+        }
         if (mapFragment != null) {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap map) {
                     googleMap = map;
-                    if (adapter_701 == null) {
-                        adapter_701 = new MyAdapter(dataList, busStationId, predict_flag, predict_locationNo, predict_time, predict_busNo, predict_stationId,
-                                googleMap, recyclerView, sliding_layout, markers, tabLayout);
-                    }
-                    for (MyDataItem dataItem : dataList) {
+                    for (Route_DataItem dataItem : Route_dataList) {
                         LatLng latLng = dataItem.getLatLng();
                         String stationName = dataItem.getStationName();
                         String stationId = dataItem.getStationId();
+                        String destination = dataItem.getDestination();
                         Marker existingMarker = markers.get(stationId);
                         if (latLng != null) {
                             if (existingMarker != null) {
@@ -117,18 +141,28 @@ public class Yangjumaps_701 extends Fragment {
                                 existingMarker.setPosition(latLng);
                             } else {
                                 MarkerOptions markerOptions = new MarkerOptions().position(latLng);
-                                markerOptions.title(stationName);
-                                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.stationicon));
+                                markerOptions.title(stationName+"["+ destination +"]");
+                                markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.busstationicon_50));
                                 Marker newMarker = googleMap.addMarker(markerOptions);
                                 markers.put(stationId, newMarker);
                             }
                         }map.animateCamera(CameraUpdateFactory.newLatLngZoom(middle, 13.5F), 250, null);
                         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                             @Override
-                            public boolean onMarkerClick(Marker marker) {
+                            public boolean onMarkerClick(@NonNull Marker marker) {
+                                String stationId = null;
+                                for (Map.Entry<String, Marker> entry : markers.entrySet()) {
+                                    if (entry.getValue().equals(marker)) {
+                                        stationId = entry.getKey();
+                                        break;
+                                    }
+                                }
                                 marker.showInfoWindow();
                                 LatLng markerLatLng = marker.getPosition();
                                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(markerLatLng, 16), 250, null);
+                                nametext.setText(marker.getTitle());
+
+                                buspredict(stationId);
                                 return true;
                             }
                         });
@@ -137,7 +171,7 @@ public class Yangjumaps_701 extends Fragment {
                 }
             });
         }
-        Button schedulebutton_701 = view.findViewById(R.id.schedulebutton_701);
+        ImageButton schedulebutton_701 = view.findViewById(R.id.schedulebutton_701);
         schedulebutton_701.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,63 +186,98 @@ public class Yangjumaps_701 extends Fragment {
 
         FloatingActionButton location_refreshButton = view.findViewById(R.id.location_refreshButton_701);
         location_refreshButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
                 isrunning = false;
                 locationThread_701.interrupt();
                 isrunning = true;
                 buslocation();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(middle).zoom(13).bearing(0).build()), 250, null);
+                nametext.setText("701");
+                timetext.setText("");
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(middle).zoom(13.5F).bearing(0).build()), 250, null);
+            }
+        });
+
+        adapter_701.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View v) {
+                int position = recyclerView.getChildAdapterPosition(v);
+                if (position != RecyclerView.NO_POSITION) {
+                    selectedItem = position;
+                    Route_DataItem clickedItem = Route_dataList.get(position);
+                    String stationId = clickedItem.getStationId();
+                    String destination = clickedItem.getDestination();
+                    buspredict(stationId);
+                    selectedstationName = clickedItem.getStationName();
+                    LatLng LatLng = adapter_701.getStationLatLng().get(stationId);
+                    Marker existingMarker = markers.get(stationId);
+                    nametext.setText(selectedstationName+ "[" + destination + "]");
+                    if (LatLng != null) {
+                        if (existingMarker != null) {
+                            existingMarker.showInfoWindow();
+                        }
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng, 16), 250, null);
+                        if (sliding_layout != null) {
+                            sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                        }
+                    }
+                }
             }
         });
         return view;
     }
-    private void buspredict(String selectedstaionId){
-        Thread predictThread_701 = new Thread(new Runnable() {
+    private void buspredict(String stationId){
+        client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
+        predictThread_701 = new Thread(new Runnable() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void run() {
-                try {
-                    StringBuilder predict_urlBuilder = new StringBuilder(PREDICT_ENDPOINT);
-                    predict_urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + SERVICE_KEY);
-                    predict_urlBuilder.append("&" + URLEncoder.encode("stationId", "UTF-8") + "=" + selectedstaionId);
-                    predict_urlBuilder.append("&" + URLEncoder.encode("routeId", "UTF-8") + "=" + ROUTE_ID701);
-                    URL predict_url = new URL(predict_urlBuilder.toString());
-                    HttpsURLConnection predict_conn = (HttpsURLConnection) predict_url.openConnection();
-                    predict_conn.setRequestMethod("GET");
-                    predict_conn.setRequestProperty("Content-type", "application/xml");
+                QueryRequest request = new QueryRequest()
+                        .withTableName("Bus701")
+                        .withKeyConditionExpression("stationId = :id")
+                        .withExpressionAttributeValues(Collections.singletonMap(":id", new AttributeValue(stationId)));
+                QueryResult result = client.query(request);
+                List<Map<String, AttributeValue>> items = result.getItems();
 
-                    StringBuilder predict_sb = new StringBuilder();
-                    try (BufferedReader predict_rd = new BufferedReader(new InputStreamReader(predict_conn.getInputStream()))) {
-                        String predict_line;
-                        while ((predict_line = predict_rd.readLine()) != null) {
-                            predict_sb.append(predict_line);
+                if (!items.isEmpty()) {
+                    Map<String, AttributeValue> item = items.get(0);
+                    AttributeValue locationNo1Attribute = item.get("locationNo1");
+                    AttributeValue predictTime1Attribute = item.get("predictTime1");
+
+                    if (locationNo1Attribute != null && predictTime1Attribute != null) {
+                        predict_locationNo = locationNo1Attribute.getS();
+                        predict_time = predictTime1Attribute.getS();
+                    }
+                }
+
+                if (!(predictThread_701.isInterrupted())) {
+                    requireActivity().runOnUiThread(() -> {
+                        if (predict_time != null && predict_locationNo != null) {
+                            if (predict_time.equals("X") && predict_locationNo.equals("X")) {
+                                if (endtext.getText().equals("운행 정보 없음")){
+                                    timetext.setText("");
+                                } else {
+                                    timetext.setText("도착 정보 없음");
+                                    timetext.setTextColor(Color.parseColor("#585858"));
+                                }
+                            } else if (predict_time.equals("1")){
+                                timetext.setText("곧 도착(" + predict_locationNo + "정류장)");
+                                timetext.setTextColor(Color.parseColor("#DF0101"));
+                            } else {
+                                timetext.setText(predict_time + "분(" + predict_locationNo + "정류장)");
+                                timetext.setTextColor(Color.parseColor("#66CC00"));
+                            }
                         }
-                    }
-                    DocumentBuilderFactory predict_factory = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder predict_builder = predict_factory.newDocumentBuilder();
-                    Document predict_document = predict_builder.parse(new InputSource(new StringReader(predict_sb.toString())));
-
-                    NodeList predict_nodeList = predict_document.getElementsByTagName("busArrivalItem");
-                    for (int i = 0; i < predict_nodeList.getLength(); i++) {
-                        Element predict_element = (Element) predict_nodeList.item(i);
-                        predict_flag = predict_element.getElementsByTagName("FLAG").item(0).getTextContent();
-                        predict_locationNo = predict_element.getElementsByTagName("locationNo1").item(0).getTextContent();
-                        predict_time = predict_element.getElementsByTagName("predictTime1").item(0).getTextContent();
-                        predict_busNo = predict_element.getElementsByTagName("plateNo1").item(0).getTextContent();
-                        predict_stationId = predict_element.getElementsByTagName("stationId").item(0).getTextContent();
-
-                        predict_conn.disconnect();
-                    }
-                } catch (IOException | ParserConfigurationException | SAXException e) {
-                    e.printStackTrace();
+                    });
                 }
             }
         });
         predictThread_701.start();
-        Log.e("Boribus", "predict_701 스레드 시작");
     }
     private void busroute() {
-        Thread routeThread_701 = new Thread(new Runnable() {
+        routeThread_701 = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -232,6 +301,7 @@ public class Yangjumaps_701 extends Fragment {
                     DocumentBuilder route_builder = route_factory.newDocumentBuilder();
                     Document route_document = route_builder.parse(new InputSource(new StringReader(route_sb.toString())));
 
+                    int desint = 0;
                     NodeList route_nodeList = route_document.getElementsByTagName("busRouteStationList");
                     for (int i = 0; i < route_nodeList.getLength(); i++) {
                         Element route_element = (Element) route_nodeList.item(i);
@@ -239,12 +309,24 @@ public class Yangjumaps_701 extends Fragment {
                         String route_stationName = route_element.getElementsByTagName("stationName").item(0).getTextContent();
                         double route_latitude = Double.parseDouble(route_element.getElementsByTagName("y").item(0).getTextContent());
                         double route_longitude = Double.parseDouble(route_element.getElementsByTagName("x").item(0).getTextContent());
+                        String route_turnYn = route_element.getElementsByTagName("turnYn").item(0).getTextContent();
+                        String destination = "";
 
-                        if (!(locationThread_701.isInterrupted())) {
+                        if (route_turnYn.equals("N") && desint == 0) {
+                            destination = "양주역 방면";
+                        } else if (route_turnYn.equals("Y")) {
+                            destination = "회차";
+                            desint = 1;
+                        } else if (route_turnYn.equals("N")) {
+                            destination = "경동대학교 방면";
+                        }
+
+                        if (!(routeThread_701.isInterrupted())) {
+                            final String finalDestination = destination;
                             requireActivity().runOnUiThread(() -> {
                                 LatLng route_latlng = new LatLng(route_latitude, route_longitude);
-                                MyDataItem dataItem = new MyDataItem(route_stationId, route_stationName, route_latlng);
-                                dataList.add(dataItem);
+                                Route_DataItem dataItem = new Route_DataItem(route_stationId, route_stationName, route_latlng, route_turnYn, finalDestination);
+                                Route_dataList.add(dataItem);
                                 saveDataToCache(route_sb.toString());
                             });
                         }
@@ -257,74 +339,88 @@ public class Yangjumaps_701 extends Fragment {
         });
         routeThread_701.start();
     }
+    @SuppressLint({"NotifyDataSetChanged", "SetTextI18n"})
     private void buslocation() {
+        client.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
         locationThread_701 = new Thread(() -> {
             while (isrunning) {
                 try {
-                    StringBuilder location_urlBuilder = new StringBuilder(LOCATION_ENDPOINT);
-                    location_urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + SERVICE_KEY);
-                    location_urlBuilder.append("&" + URLEncoder.encode("routeId", "UTF-8") + "=" + ROUTE_ID701);
-                    URL location_url = new URL(location_urlBuilder.toString());
-                    HttpsURLConnection location_conn = (HttpsURLConnection) location_url.openConnection();
-                    location_conn.setRequestMethod("GET");
-                    location_conn.setRequestProperty("Content-type", "application/xml");
+                    ScanRequest request = new ScanRequest()
+                            .withTableName("BusLocation701")
+                            .withProjectionExpression("stationId, endBus, plateNo");
+                    ScanResult result = client.scan(request);
+                    List<Map<String, AttributeValue>> items = result.getItems();
 
-                    StringBuilder location_sb = new StringBuilder();
-                    try (BufferedReader location_rd = new BufferedReader(new InputStreamReader(location_conn.getInputStream()))) {
-                        String location_line;
-                        while ((location_line = location_rd.readLine()) != null) {
-                            location_sb.append(location_line);
-                        }
-                    }
-                    DocumentBuilderFactory location_factory = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder location_builder = location_factory.newDocumentBuilder();
-                    Document location_document = location_builder.parse(new InputSource(new StringReader(location_sb.toString())));
-
-                    NodeList location_nodeList = location_document.getElementsByTagName("stationId");
-                    for (int i = 0; i < location_nodeList.getLength(); i++) {
-                        Element location_element = (Element) location_nodeList.item(i);
-                        busStationId = location_element.getTextContent();
+                    for (Map<String, AttributeValue> item : items) {
+                        busStationId = Objects.requireNonNull(item.get("stationId")).getS();
+                        busEnd = Objects.requireNonNull(item.get("endBus")).getS();
+                        busNo = Objects.requireNonNull(item.get("plateNo")).getS();
                     }
                     if (!(locationThread_701.isInterrupted())) {
                         requireActivity().runOnUiThread(() -> {
+                            if (busEnd != null && busEnd.equals("0")) {
+                                endtext.setText(busNo + " 운행 중");
+                                endtext.setTextColor(Color.parseColor("#009999"));
+                                progressBar.setVisibility(View.GONE);
+                            } else if (busEnd != null && busEnd.equals("1")) {
+                                endtext.setText(busNo + " 막차");
+                                progressBar.setVisibility(View.GONE);
+                                endtext.setTextColor(Color.parseColor("#DF0101"));
+                            } else {
+                                endtext.setText("운행 정보 없음");
+                                progressBar.setVisibility(View.GONE);
+                            }
                             if (busStationId != null) {
-                                for (int i = 0; i < dataList.size(); i++) {
-                                    MyDataItem item = dataList.get(i);
+                                adapter_701.updateBusStationId(busStationId);
+
+                                for (Map.Entry<String, Marker> entry : markers.entrySet()) {
+                                    Marker marker = entry.getValue();
+                                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.busstationicon_50));
+                                }
+
+                                for (int i = 0; i < Route_dataList.size(); i++) {
+                                    Route_DataItem item = Route_dataList.get(i);
                                     String stationName = item.getStationName();
                                     String stationId = item.getStationId();
+                                    String destination = item.getDestination();
+
                                     if (stationId != null && stationId.equals(busStationId)) {
                                         LatLng latLng = adapter_701.getStationLatLng().get(stationId);
+
                                         if (latLng != null) {
-                                            if (busMarker == null) {
-                                                busMarker = googleMap.addMarker(new MarkerOptions().position(latLng).title("현위치 : " + stationName).icon(BitmapDescriptorFactory.fromResource(R.drawable.yangjubusicon_25)));
-                                                Objects.requireNonNull(busMarker).showInfoWindow();
-                                                //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15), 250, null);
-                                            } else {
-                                                busMarker.setTitle("현위치 : " + stationName);
-                                                busMarker.setPosition(latLng);
-                                                busMarker.showInfoWindow();
-                                                //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15), 250, null);
+                                            Marker specialMarker = markers.get(stationId);
+                                            if (specialMarker != null) {
+                                                specialMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.yangjubusicon_25));
+
+                                                specialMarker.setTitle("현위치 : " + stationName + "[" + destination + "]");
+                                                specialMarker.setPosition(latLng);
+                                                specialMarker.showInfoWindow();
+                                                progressBar.setVisibility(View.GONE);
                                             }
                                         }
                                         break;
                                     }
                                 }
-
                             }
                         });
                     }
-                    location_conn.disconnect();
-                } catch (IOException | ParserConfigurationException | SAXException e) {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                } catch (AmazonClientException e) {
                     e.printStackTrace();
-                }
-
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    isrunning = false;
+                    locationThread_701.interrupt();
+                    if (locationThread_701.isInterrupted() && !locationThread_701.isAlive()) {
+                        isrunning = true;
+                        locationThread_701.start();
+                    }
                 }
             }
-        }); locationThread_701.start();
+        });
+        locationThread_701.start();
     }
     private void saveDataToCache(String data) {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("cache_701", Context.MODE_PRIVATE);
@@ -346,6 +442,7 @@ public class Yangjumaps_701 extends Fragment {
                 InputSource is = new InputSource(new StringReader(cachedXmlData));
                 Document document = builder.parse(is);
 
+                int desint = 0;
                 NodeList nodeList = document.getElementsByTagName("busRouteStationList");
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Element element = (Element) nodeList.item(i);
@@ -354,17 +451,24 @@ public class Yangjumaps_701 extends Fragment {
                     double cache_latitude = Double.parseDouble(element.getElementsByTagName("y").item(0).getTextContent());
                     double cache_longitude = Double.parseDouble(element.getElementsByTagName("x").item(0).getTextContent());
                     LatLng cache_latLng = new LatLng(cache_latitude, cache_longitude);
-                    MyDataItem dataItem = new MyDataItem(cache_stationId, cache_stationName, cache_latLng);
-                    dataList.add(dataItem);
+                    String cache_turnYn = element.getElementsByTagName("turnYn").item(0).getTextContent();
+                    String destination = "";
+
+                    if (cache_turnYn.equals("N") && desint == 0) {
+                        destination = "양주역 방면";
+                    } else if (cache_turnYn.equals("Y")) {
+                        destination = "회차";
+                        desint = 1;
+                    } else if (cache_turnYn.equals("N")) {
+                        destination = "경동대학교 방면";
+                    }
+                    final String finalDestination = destination;
+                    Route_DataItem dataItem = new Route_DataItem(cache_stationId, cache_stationName, cache_latLng, cache_turnYn, finalDestination);
+                    Route_dataList.add(dataItem);
                 }
             } catch (ParserConfigurationException | SAXException | IOException e) {
                 e.printStackTrace();
             }
-        }
-    }
-    private void moveCameraToLocation(LatLng location, float zoom) {
-        if (googleMap != null) {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
         }
     }
 
@@ -377,10 +481,21 @@ public class Yangjumaps_701 extends Fragment {
             sliding_layout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         }
     }
+    public void performMarkerClick(String stationId) {
+        Marker marker = markers.get(stationId);
 
+        if (marker != null) {
+            marker.showInfoWindow();
+            LatLng markerLatLng = marker.getPosition();
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(markerLatLng, 16), 250, null);
+            nametext.setText(marker.getTitle());
+            buspredict(stationId);
+        }
+    }
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        savecontext = context;
         String cachedData = loadCachedData();
         if (cachedData != null && !cachedData.isEmpty()) {
             loadDataFromCache();

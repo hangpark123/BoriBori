@@ -1,7 +1,9 @@
 package com.kdu.busboristudent;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,16 +17,18 @@ import androidx.annotation.Nullable;
 
 import com.kdu.busbori.R;
 
-public class Schedule_733 extends Fragment {
+import java.util.Objects;
+
+public class Schedule_school extends Fragment {
     private WebView webView;
-    @SuppressLint({"MissingInflatedId", "SetJavaScriptEnabled"})
+    @SuppressLint("SetJavaScriptEnabled")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.schedule_733, container, false);
-        webView = view.findViewById(R.id.web_733);
+        View view = inflater.inflate(R.layout.schedule_school, container, false);
+        webView = view.findViewById(R.id.web_school);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -33,7 +37,25 @@ public class Schedule_733 extends Fragment {
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl("https://modo-phinf.pstatic.net/20230410_156/16811194477317z3hJ_PNG/mosauu00MS.png?type=w720");
+        webView.loadUrl("https://www.kduniv.ac.kr/kor/CMS/Contents/Contents.do?mCode=MN186");
+
+        webView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction()!=KeyEvent.ACTION_DOWN)
+                    return true;
+
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (webView.canGoBack()) {
+                        webView.goBack();
+                    } else {
+                        requireActivity().onBackPressed();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
 
         return view;
     }

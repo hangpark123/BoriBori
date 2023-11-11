@@ -7,20 +7,11 @@
 
     <fragment
         android:id="@+id/schedule_dobong"
-        android:name="com.kdu.busboristudent.Schedule_dobong"
+        android:name="com.kdu.busboristudent.Schedule_school"
         android:label="schedule_dobong"
-        tools:layout="@layout/schedule_dobong" >
+        tools:layout="@layout/schedule_school" >
         <action
-            android:id="@+id/action_schedule_dobong_to_schedule_yangju"
-            app:destination="@id/schedule_yangju" />
-    </fragment>
-    <fragment
-        android:id="@+id/schedule_yangju"
-        android:name="com.kdu.busboristudent.Schedule_yangju"
-        android:label="schedule_yangju"
-        tools:layout="@layout/schedule_yangju" >
-        <action
-            android:id="@+id/action_schedule_yangju_to_schedule_701"
+            android:id="@+id/action_schedule_dobong_to_schedule_7012"
             app:destination="@id/schedule_701" />
     </fragment>
     <fragment

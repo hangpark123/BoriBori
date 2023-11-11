@@ -4,76 +4,212 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#B49BE1">
+    android:background="#FFE7F5FB">
 
-    <TableLayout
+    <LinearLayout
+        android:id="@+id/topbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="60dp"
+        android:background="@drawable/rectangle3"
+        android:elevation="10dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints">
 
-        <TableRow
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            app:srcCompat="@drawable/logo" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bot"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topbar"
+        android:padding="15dp">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/button_schedule"
-                android:layout_width="294dp"
-                android:layout_height="136dp"
-                android:text="시간표"
-                tools:ignore="MissingConstraints" />
-        </TableRow>
-
-        <TableRow
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="* 운행 시간표"
+                android:textColor="#26383A"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="110dp"
+            android:background="@drawable/rectangle"
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/button_cam"
-                android:layout_width="124dp"
-                android:layout_height="133dp"
-                android:text="셔틀버스"
-                tools:ignore="MissingConstraints" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
 
-        </TableRow>
+                <Button
+                    android:id="@+id/button_schedule"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFE3E9FF"
+                    android:drawableTop="@drawable/button3"
+                    android:text="버스 시간표"
+                    tools:ignore="MissingConstraints" />
+            </LinearLayout>
 
-        <TableRow
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp"
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/button_701"
-                android:layout_width="124dp"
-                android:layout_height="133dp"
-                android:text="701"
-                tools:ignore="MissingConstraints" />
-        </TableRow>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="* 실시간 위치"
+                android:textColor="#26383A"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-        <TableRow
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="110dp"
+            android:background="@drawable/rectangle"
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/button_21"
-                android:layout_width="124dp"
-                android:layout_height="133dp"
-                android:text="21"
-                tools:ignore="MissingConstraints" />
-        </TableRow>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
 
-        <TableRow
+                <Button
+                    android:id="@+id/button_cam"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFE3E9FF"
+                    android:drawableTop="@drawable/button1"
+                    android:drawingCacheQuality="high"
+                    android:text="셔틀버스"
+                    tools:ignore="MissingConstraints" />
+
+                <Button
+                    android:id="@+id/button_701"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFE3E9FF"
+                    android:drawableTop="@drawable/button2"
+                    android:drawingCacheQuality="high"
+                    android:text="701"
+                    tools:ignore="MissingConstraints" />
+
+                <Button
+                    android:id="@+id/button_21"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFE3E9FF"
+                    android:drawableTop="@drawable/button2"
+                    android:drawingCacheQuality="high"
+                    android:text="21"
+                    tools:ignore="MissingConstraints" />
+
+                <Button
+                    android:id="@+id/button_733"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFE3E9FF"
+                    android:drawableTop="@drawable/button2"
+                    android:drawingCacheQuality="high"
+                    android:text="73-3"
+                    tools:ignore="MissingConstraints" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="5dp"
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/button_733"
-                android:layout_width="124dp"
-                android:layout_height="133dp"
-                android:text="73-3"
-                tools:ignore="MissingConstraints" />
-        </TableRow>
-    </TableLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="* 즐겨찾기"
+                android:textColor="#26383A"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@drawable/rectangle"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/rectangle2">
+
+                </androidx.viewpager2.widget.ViewPager2>
+
+                <me.relex.circleindicator.CircleIndicator3
+                    android:id="@+id/indicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_gravity="bottom"
+                    app:ci_drawable="@drawable/oval"
+                    app:ci_height="4dp"
+                    app:ci_margin="4dp"
+                    app:ci_width="4dp"
+                    tools:ignore="MissingClass" />
+            </FrameLayout>
+
+        </LinearLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topbar" />
 </androidx.constraintlayout.widget.ConstraintLayout>

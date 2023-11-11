@@ -4,14 +4,8 @@
 
     <item
         android:id="@+id/menu_dobong"
-        android:actionLayout="@layout/schedule_dobong"
-        android:title="도봉산"
-        android:visible="true"
-        tools:ignore="HardcodedText" />
-    <item
-        android:id="@+id/menu_yangjoo"
-        android:actionLayout="@layout/schedule_yangju"
-        android:title="양주"
+        android:actionLayout="@layout/schedule_school"
+        android:title="셔틀버스"
         android:visible="true"
         tools:ignore="HardcodedText" />
     <item

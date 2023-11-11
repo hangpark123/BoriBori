@@ -17,15 +17,14 @@ public class Fragment_schedule extends Fragment {
         super.onCreate(savedInstanceState);
 
         getChildFragmentManager().beginTransaction()
-                .add(R.id.frame, new Schedule_dobong())
+                .add(R.id.frame, new Schedule_school())
                 .commit();
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
 
-        Fragment schedule_dobong = new Schedule_dobong();
-        Fragment schedule_yangju = new Schedule_yangju();
+        Fragment schedule_school = new Schedule_school();
         Fragment schedule_701 = new Schedule_701();
         Fragment schedule_733 = new Schedule_733();
         Fragment schedule_21 = new Schedule_21();
@@ -41,20 +40,17 @@ public class Fragment_schedule extends Fragment {
                 Fragment selected = null;
                 if(position == 0){
 
-                    selected = schedule_dobong;
+                    selected = schedule_school;
 
                 }else if (position == 1){
 
-                    selected = schedule_yangju;
+                    selected = schedule_701;
 
                 }else if (position == 2){
 
-                    selected = schedule_701;
+                    selected = schedule_733;
 
                 }else if (position == 3){
-
-                    selected = schedule_733;
-                }else if (position == 4){
 
                     selected = schedule_21;
                 }

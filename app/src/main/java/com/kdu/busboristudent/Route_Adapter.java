@@ -1,71 +1,80 @@
 package com.kdu.busboristudent;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.tabs.TabLayout;
 import com.kdu.busbori.R;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-    private List<MyDataItem> dataList;
+public class Route_Adapter extends RecyclerView.Adapter<Route_Adapter.ViewHolder> {
+    private List<Route_DataItem> Route_dataList;
     private Map<String, LatLng> stationLatLngMap;
-    private Map<String, Marker> markers = new HashMap<>();
     private String busStationId;
-    private String predict_flag;
-    private String predict_locationNo;
-    private String predict_time;
-    private String predict_busNo;
-    private String predict_stationId;
     private int selectedItem = -1;
-    private GoogleMap googleMap;
+    private String Bus;
+    private String busKey;
+    private Context context;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
+    private Set<String> favoriteStations;
     private RecyclerView recyclerView;
-    private SlidingUpPanelLayout sliding;
     private TabLayout tabLayout;
-    public MyAdapter(List<MyDataItem> dataList, String busStationId, String predict_flag, String predict_locationNo, String predict_time, String predict_busNo, String predict_stationId, GoogleMap googleMap, RecyclerView recyclerView, SlidingUpPanelLayout sliding, Map markers, TabLayout tabLayout) {
-        this.dataList = dataList;
+    private View.OnClickListener onItemClickListener;
+    public Route_Adapter(List<Route_DataItem> Route_dataList, String busStationId, RecyclerView recyclerView, TabLayout tabLayout, String Bus, Context context) {
+        this.Route_dataList = Route_dataList;
         this.busStationId = busStationId;
-        this.predict_flag = predict_flag;
-        this.predict_locationNo = predict_locationNo;
-        this.predict_time = predict_time;
-        this.predict_busNo = predict_busNo;
-        this.predict_stationId = predict_stationId;
-        this.googleMap = googleMap;
         this.recyclerView = recyclerView;
-        this.sliding = sliding;
-        this.markers = markers;
         this.tabLayout = tabLayout;
+        this.Bus = Bus;
+        this.context = context;
 
         stationLatLngMap = new HashMap<>();
-        for (MyDataItem item : dataList) {
-
+        for (Route_DataItem item : Route_dataList) {
             stationLatLngMap.put(item.getStationId(), item.getLatLng());
         }
 
+        busKey = Bus + "_favorite";
+        sharedPreferences = context.getSharedPreferences(busKey, Context.MODE_PRIVATE);
+        favoriteStations = sharedPreferences.getStringSet(busKey, new LinkedHashSet<>());
+        List<String> stationIds = new ArrayList<>();
+        List<String> destinations = new ArrayList<>();
+
+        for (String combinedValue : favoriteStations) {
+            String[] parts = combinedValue.split("\\|");
+            for (int i = 0; i < parts.length; i += 2) {
+                if (i + 1 < parts.length) {
+                    stationIds.add(parts[i]);
+                    destinations.add(parts[i + 1]);
+                }
+            }
+        }
+        for (Route_DataItem item : Route_dataList) {
+            String stationId = item.getStationId();
+            boolean isFavorite = stationIds.contains(stationId);
+            item.setFavorite(isFavorite);
+        }
     }
     public Map<String, LatLng> getStationLatLng() {
         return stationLatLngMap;
@@ -93,13 +102,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         return new ViewHolder(view);
     }
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint({"NotifyDataSetChanged", "SetTextI18n"})
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        dataList = dataList.stream().distinct().collect(Collectors.toList());
-        MyDataItem item = dataList.get(position);
+        Route_dataList = Route_dataList.stream().distinct().collect(Collectors.toList());
+        Route_DataItem item = Route_dataList.get(position);
         holder.textView.setText(item.getStationName());
-        holder.textView2.setText(item.getStationId());
+        holder.textView2.setText(item.getDestination());
         if (busStationId != null && busStationId.equals(item.getStationId())) {
             holder.busIcon.setVisibility(View.VISIBLE);
         } else {
@@ -108,22 +117,23 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         if (position == selectedItem) {
             holder.itemLayout.setBackgroundResource(R.drawable.item_click_background);
         }
+        holder.starButton.setChecked(item.isFavorite());
     }
 
     @Override
     public int getItemCount() {
-        return dataList.size();
+        return Route_dataList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        MyDataItem item = dataList.get(position);
-        String stationId = item.getStationId();
+        Route_DataItem item = Route_dataList.get(position);
+        String turnYn = item.getturnYn();
         if (position == 0) {
             return 0;
         } else if (position == getItemCount() - 1) {
             return 1;
-        } else if ("235001220".equals(stationId) || "235000658".equals(stationId) || "235000242".equals(stationId)) {
+        } else if ("Y".equals(turnYn)) {
             return 2;
         }
         return 3;
@@ -133,6 +143,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         public TextView textView2;
         public LinearLayout itemLayout;
         public ImageView busIcon;
+        public ToggleButton starButton;
 
         @SuppressLint("ResourceType")
         public ViewHolder(@NonNull View itemView) {
@@ -141,6 +152,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             textView2 = itemView.findViewById(R.id.textview2);
             itemLayout = itemView.findViewById(R.id.item_layout);
             busIcon = itemView.findViewById(R.id.visiblebusicon);
+            starButton = itemView.findViewById(R.id.favorite_toggle_button);
+
             RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(recyclerView.getContext()) {
                 @Override protected int getVerticalSnapPreference() {
                     return LinearSmoothScroller.SNAP_TO_START;
@@ -151,23 +164,34 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
+                        onItemClickListener.onClick(v);
+                    }
+                }
+            });
+            starButton.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("MutatingSharedPrefs")
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
-                        selectedItem = position;
-                        notifyDataSetChanged();
-                        MyDataItem clickedItem = dataList.get(position);
+                        Route_DataItem clickedItem = Route_dataList.get(position);
                         String stationId = clickedItem.getStationId();
-                        LatLng LatLng = getStationLatLng().get(stationId);
-                        Marker existingMarker = markers.get(stationId);
+                        String destination = clickedItem.getDestination();
+                        String combine = stationId + "|" + destination;
+                        boolean isFavorite = clickedItem.isFavorite();
 
-                        if (LatLng != null) {
-                            if (existingMarker != null) {
-                                existingMarker.showInfoWindow();
-                            }
-                            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng, 16), 250, null);
-                            if (sliding != null) {
-                                sliding.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                            }
+                        if (starButton.isChecked() && !isFavorite) {
+                            favoriteStations.add(combine);
+                            clickedItem.setFavorite(true);
+                        } else if (!starButton.isChecked() && isFavorite) {
+                            favoriteStations.remove(combine);
+                            clickedItem.setFavorite(false);
                         }
+                        editor = sharedPreferences.edit();
+                        editor.clear();
+                        editor.putStringSet(busKey, favoriteStations);
+                        editor.apply();
                     }
                 }
             });
@@ -179,7 +203,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
                     if(position == 0) {
                         recyclerView.smoothScrollToPosition(0);
-                        Log.e("brr", String.valueOf(tabLayout.getTag()));
                     } else if (position == 1) {
                         if (tabLayout.getTag().equals("701")){
                             smoothScroller.setTargetPosition(18);
@@ -219,9 +242,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             });
         }
     }
-    private void moveCameraToLocation(LatLng location, float zoom) {
-        if (googleMap != null) {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoom));
-        }
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateBusStationId(String newBusStationId) {
+        busStationId = newBusStationId;
+        notifyDataSetChanged();
+    }
+    public void setOnClickListener(View.OnClickListener listener) {
+        onItemClickListener = listener;
     }
 }

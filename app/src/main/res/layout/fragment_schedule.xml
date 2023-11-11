@@ -3,52 +3,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFE7F5FB">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="15dp"
+        android:background="@drawable/rectangle">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#ECEDD5"
+            android:background="#FFE3E9FF"
+            app:tabIndicatorColor="#99CCFF"
             tools:ignore="MissingConstraints">
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/tab_dobong"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="도봉산"
-                app:tabMode="scrollable" />
-
-            <com.google.android.material.tabs.TabItem
-                android:id="@+id/tab_yangju"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="양주"
+                android:text="셔틀버스"
                 app:tabMode="scrollable" />
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/tab_701"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="701번"
+                android:text="701"
                 app:tabMode="scrollable" />
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/tab_733"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="73-3번"
+                android:text="73-3"
                 app:tabMode="scrollable" />
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/tab_21"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="21번"
+                android:text="21"
                 app:tabMode="scrollable" />
         </com.google.android.material.tabs.TabLayout>
 

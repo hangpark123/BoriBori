@@ -33,11 +33,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.kdu.busboristudent.StudentActivity"
-            android:exported="true">
-
-        </activity>
     </application>
 
 </manifest>
