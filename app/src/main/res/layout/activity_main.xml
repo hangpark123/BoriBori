@@ -12,16 +12,32 @@
         android:layout_height="60dp"
         android:background="@drawable/rectangle3"
         android:elevation="10dp"
-        android:orientation="vertical"
+        android:gravity="center|right"
+        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints">
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="100dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             app:srcCompat="@drawable/logo" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/notify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:layout_margin="10dp"
+            app:srcCompat="@drawable/icon_notify" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -149,7 +165,6 @@
                     android:drawingCacheQuality="high"
                     android:text="73-3"
                     tools:ignore="MissingConstraints" />
-
             </LinearLayout>
 
         </LinearLayout>

@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.kdu.busboristudent.Fragment_favorite_701">
+
+    <TextView
+        android:id="@+id/text701"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:clickable="true"
+        android:text="701"
+        android:textColor="#0088FF" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="#99CCFF" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/favoritelist_701"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:divider="#BAD5FD"
+        android:dividerHeight="1dp" />
+
+</LinearLayout>

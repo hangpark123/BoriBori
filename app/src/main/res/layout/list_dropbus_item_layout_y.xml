@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:background="@drawable/item_click_background"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textview1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#E7F5FB"
+                android:gravity="center|start"
+                android:paddingStart="5dp"
+                android:text=""
+                android:textSize="15dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textview1_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|start"
+                android:paddingStart="5dp"
+                android:text=""
+                android:textSize="11dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textview1_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center|start"
+                android:paddingStart="5dp"
+                android:text=""
+                android:textSize="8dp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/textview2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center|left"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="26.5dp"
+            android:layout_marginBottom="10dp"
+            android:drawableBottom="@drawable/station"
+            android:gravity="center"
+            android:text=""
+            android:textSize="8dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textview3"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center|right"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="26.5dp"
+            android:layout_marginBottom="10dp"
+            android:drawableBottom="@drawable/station"
+            android:gravity="center"
+            android:text=""
+            android:textSize="8dp"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="99dp"
+            android:background="#CCCCCC" />
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:progressTint="#00FFFFFF"
+            android:thumb="@drawable/busbar" />
+
+    </FrameLayout>
+
+
+</LinearLayout>

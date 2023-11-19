@@ -9,16 +9,17 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="15dp"
         android:background="@drawable/rectangle">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFE3E9FF"
-            app:tabIndicatorColor="#99CCFF"
-            tools:ignore="MissingConstraints">
+            android:background="#FFFFFF"
+            app:tabIndicatorColor="#FFFFFF"
+            app:tabIndicatorHeight="2dp"
+            app:tabSelectedTextColor="#3F51B5"
+            app:tabTextColor="#3F51B5">
 
             <com.google.android.material.tabs.TabItem
                 android:id="@+id/tab_dobong"

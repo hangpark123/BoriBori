@@ -50,6 +50,8 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="20dp"
                 android:clickable="true"
+                android:tint="#BFCBF8"
+                app:backgroundTint="#FFFFFF"
                 app:layout_constraintBottom_toTopOf="@+id/null_701"
                 app:layout_constraintEnd_toEndOf="@+id/map_701"
                 app:showMotionSpec="@android:anim/cycle_interpolator"
@@ -247,6 +249,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:indeterminateTint="#BFCBF8"
             tools:ignore="MissingConstraints" />
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

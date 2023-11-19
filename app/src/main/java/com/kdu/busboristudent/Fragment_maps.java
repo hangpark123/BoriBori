@@ -1,6 +1,7 @@
 package com.kdu.busboristudent;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -63,8 +64,10 @@ public class Fragment_maps extends Fragment {
     private String destination;
     private String type;
     private String time;
+    private String turnYn;
     private String Run;
     private String distance;
+    private String distance_now;
     private LatLng latLng;
     private Thread datathread;
     private Thread routethread;
@@ -107,7 +110,6 @@ public class Fragment_maps extends Fragment {
                 @Override
                 public void onMapReady(GoogleMap map) {
                     googleMap = map;
-
                     for (Map.Entry<String, LatLng> entry : stationCoordinates.entrySet()) {
                         String stationName = entry.getKey();
                         LatLng stationLocation = entry.getValue();
@@ -183,10 +185,8 @@ public class Fragment_maps extends Fragment {
                 }
             }
         });
-        recyclerView.setAdapter(adapter);
         return view;
     }
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -240,34 +240,17 @@ public class Fragment_maps extends Fragment {
                             destination = Objects.requireNonNull(item.get("destination")).getS();
                             type = Objects.requireNonNull(item.get("type")).getS();
                             time = Objects.requireNonNull(item.get("time")).getS();
+                            turnYn = Objects.requireNonNull(item.get("turnYn")).getS();
+                            distance = Objects.requireNonNull(item.get("distance")).getS();
+                            distance_now = Objects.requireNonNull(item.get("distance_now")).getS();
                             String latitudeStr = item.get("latitude") != null ? Objects.requireNonNull(item.get("latitude")).getS() : null;
                             String longitudeStr = item.get("longitude") != null ? Objects.requireNonNull(item.get("longitude")).getS() : null;
                             Run = item.get("Run") != null ? Objects.requireNonNull(item.get("Run")).getS() : null;
-                            School_DataItem dataItem = new School_DataItem(deviceid, destination, type, time, latLng, Run, distance);
+                            School_DataItem dataItem = new School_DataItem(deviceid, destination, type, time, turnYn, latLng, Run, distance, distance_now);
                             if (latitudeStr != null && longitudeStr != null) {
                                 double latitude = Double.parseDouble(latitudeStr);
                                 double longitude = Double.parseDouble(longitudeStr);
                                 latLng = new LatLng(latitude, longitude);
-
-                                if (type.equals("등교")){
-
-                                } else if (type.equals("하교")){
-
-                                }
-
-                                if (time.contains("도봉산[등교]")){
-                                    double calculatedDistance = calculateDistance(Dobong, latLng);
-                                    distance = (int)calculatedDistance + "m";
-                                } else if (time.contains("도봉산[하교]")){
-                                    double calculatedDistance = calculateDistance(Dobong, latLng);
-                                    distance = (int)calculatedDistance + "m";
-                                } else if (time.contains("양주[등교]")){
-                                    double calculatedDistance = calculateDistance(Yangju, latLng);
-                                    distance = (int)calculatedDistance + "m";
-                                } else if (time.contains("양주[하교]")){
-                                    double calculatedDistance = calculateDistance(Yangju, latLng);
-                                    distance = (int)calculatedDistance + "m";
-                                }
 
                                 Marker existingMarker = markers.get(deviceid);
                                 if (latLng != null && deviceid != null && time != null) {
@@ -278,6 +261,9 @@ public class Fragment_maps extends Fragment {
                                             existingMarker.setVisible(true);
                                         }else {
                                             existingMarker.setVisible(false);
+                                        }
+                                        if (School_dataList.isEmpty()){
+                                            progressBar.setVisibility(View.GONE);
                                         }
                                     } else {
                                         MarkerOptions markerOptions = new MarkerOptions().position(latLng);
@@ -292,10 +278,17 @@ public class Fragment_maps extends Fragment {
                                         }
                                     }
                                 }
+                                int size = adapter.getItemCount();
+                                recyclerView.setMinimumHeight(size*100);
+                                if (size > 3) {
+                                    recyclerView.setMinimumHeight(300);
+                                }
+                                if (size > 0) {
+                                    progressBar.setVisibility(View.GONE);
+                                }
                                 adapter.updateAdapterData(School_dataList);
                             }
                         }
-                        progressBar.setVisibility(View.GONE);
                     });
                 }
 
@@ -303,6 +296,11 @@ public class Fragment_maps extends Fragment {
                     Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    isrunning = false;
+                    if (datathread.isInterrupted()){
+                        isrunning = true;
+                        datathread.start();
+                    }
                 }
             }
         });

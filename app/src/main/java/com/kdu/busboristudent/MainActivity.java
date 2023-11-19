@@ -1,6 +1,7 @@
 package com.kdu.busboristudent;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -8,6 +9,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -52,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Intent serviceIntent = new Intent(MainActivity.this, NotifyService.class);
+        startForegroundService(serviceIntent);
         Button Schedulebutton = findViewById(R.id.button_schedule);
         Button Campusbutton = findViewById(R.id.button_cam);
         Button bus701button = findViewById(R.id.button_701);
@@ -64,6 +69,22 @@ public class MainActivity extends AppCompatActivity {
         indicator = findViewById(R.id.indicator);
         indicator.setViewPager(viewPager2);
 
+        ImageButton notify = findViewById(R.id.notify);
+        notify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                Fragment fragment = fragmentManager.findFragmentByTag(Fragment_notify.class.getSimpleName());
+
+                if (fragment == null) {
+                    fragment = new Fragment_notify();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.container, fragment, Fragment_notify.class.getSimpleName());
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+            }
+        });
         Schedulebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     @Override
     public void onBackPressed() {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.container);
@@ -166,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
         } else if (currentFragment instanceof Schedule_733) {
             super.onBackPressed();
         } else if (currentFragment instanceof Schedule_school) {
+            super.onBackPressed();
+        } else if (currentFragment instanceof Fragment_notify) {
             super.onBackPressed();
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
